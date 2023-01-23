@@ -10,17 +10,24 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun ThreeDAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
-
+    val systemUiController = rememberSystemUiController()
 
     val colors = if (darkTheme) {
+        systemUiController.setStatusBarColor(
+            color = BackgroundColorDark
+        )
         DarkColorPalette
     } else {
+        systemUiController.setStatusBarColor(
+            color = BackgroundColorLight
+        )
         LightColorPalette
     }
     CompositionLocalProvider(LocalColors provides colors) {
@@ -59,9 +66,10 @@ data class MyColors(
 
 private val DarkColorPalette = MyColors(
     material = darkColors(
-        primary = Purple200,
+        primary = PrimaryDark,
         primaryVariant = Purple700,
-        secondary = Teal200,
+        secondary = SecondaryDark,
+        background = BackgroundColorDark,
     ),
     interviewHeaderColor = InterviewHeaderColorDark,
     answeredColor = AnsweredColorDark,
@@ -74,9 +82,10 @@ private val DarkColorPalette = MyColors(
 
 private val LightColorPalette = MyColors(
     material = lightColors(
-        primary = Purple500,
+        primary = PrimaryLight,
         primaryVariant = Purple700,
-        secondary = Teal200,
+        secondary = SecondaryLight,
+        background = BackgroundColorLight,
     ),
     interviewHeaderColor = InterviewHeaderColor,
     answeredColor = AnsweredColorLight,

@@ -7,6 +7,7 @@ import android.view.animation.LinearInterpolator
 import com.google.android.filament.*
 import com.google.android.filament.android.DisplayHelper
 import com.google.android.filament.android.UiHelper
+import java.time.Duration
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -32,12 +33,19 @@ class ModelViewer(
             field = value
         }
 
+    var scale = 4.0
+    var rotation = 0.0
+
     private val uiHelper: UiHelper = UiHelper(UiHelper.ContextErrorPolicy.DONT_CHECK)
     private var displayHelper: DisplayHelper
     private var swapChain: SwapChain? = null
     private val renderer: Renderer = engine.createRenderer()
 
-    private val animator = ValueAnimator.ofFloat(0.0f, (2.0 * PI).toFloat())
+    private var animationDuration = 60_000
+    private var animationOnOff = false
+    private var animator = ValueAnimator.ofFloat(0.0f, (2.0 * PI).toFloat())
+
+    val start = 0f
 
     init {
         view.camera = camera
@@ -47,22 +55,10 @@ class ModelViewer(
         uiHelper.attachTo(surfaceView)
         addDetachListener(surfaceView)
 
-        val start = Random.nextFloat()
+        animateModelView()
 
-        animator.interpolator = LinearInterpolator()
-        animator.duration = 36_000
-        animator.repeatMode = ValueAnimator.RESTART
-        animator.repeatCount = ValueAnimator.INFINITE
-        animator.addUpdateListener { a ->
-            val v = (a.animatedValue as Float) + start
-            camera.lookAt(
-                cos(v) * 2.5, 0.5, sin(v) * 2.5,
-                0.0, 0.0, 0.0,
-                0.0, 1.0, 0.0
-            )
-        }
-        animator.start()
     }
+
 
     fun render(frameTimeNanos: Long) {
         if (!uiHelper.isReadyToRender) {
@@ -74,6 +70,25 @@ class ModelViewer(
             renderer.render(view)
             renderer.endFrame()
         }
+    }
+    fun animationSettings(start:Boolean, duration: Long = 60_000){
+        animationDuration = duration.toInt()
+        animationOnOff = start
+    }
+    private fun animateModelView(){
+        animator.interpolator = LinearInterpolator()
+        animator.duration = 60_000
+        animator.repeatMode = ValueAnimator.RESTART
+        animator.repeatCount = ValueAnimator.INFINITE
+        animator.addUpdateListener { a ->
+            val v = if(animationOnOff){(a.animatedValue as Float) + start} else 0f
+            camera.lookAt(
+                cos(v + rotation) * scale, 0.5, sin(v + rotation) * scale,
+                0.0, 0.0, 0.0,
+                0.0, 1.0, 0.0
+            )
+        }
+        animator.start()
     }
 
     private fun addDetachListener(view: android.view.View) {

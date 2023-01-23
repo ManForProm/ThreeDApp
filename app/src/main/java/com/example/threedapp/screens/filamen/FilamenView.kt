@@ -13,7 +13,7 @@ import com.example.threedapp.base.setupModelViewer
 import com.google.android.filament.Colors
 
 @Composable
-fun FilamentViewer() {
+fun FilamentViewer(scale:Double,startAnimation:Boolean,rotation:Double,sceneIn:String) {
     var modelViewer by remember { mutableStateOf<ModelViewer?>(null) }
 
     LaunchedEffect(key1 = true){
@@ -23,11 +23,13 @@ fun FilamentViewer() {
             }
         }
     }
-        val (engine, scene, asset) = scenes["Wood"]!!
-        modelViewer?.scene = scene
-
+    val (engine, scene, asset) = scenes[sceneIn]!!
+    modelViewer?.scene = scene
+    modelViewer?.scale = scale
+    modelViewer?.rotation = rotation
+    modelViewer?.animationSettings(start = startAnimation)
         asset.entities.find {
-            asset.getName(it)?.startsWith("car_paint_red") ?: false
+            asset.getName(it)?.startsWith("Wood") ?: false
         }?.also { entity ->
             val manager = engine.renderableManager
             val instance = manager.getInstance(entity)
@@ -49,7 +51,7 @@ fun FilamentViewer() {
         LayoutInflater.from(context).inflate(
             R.layout.filament_host, FrameLayout(context), false
         ).apply {
-            val (engine) = scenes["Wood"]!!
+            val (engine) = scenes[sceneIn]!!
             modelViewer = ModelViewer(engine, this as SurfaceView).also {
                 setupModelViewer(it)
             }
