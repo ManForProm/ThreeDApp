@@ -13,10 +13,17 @@ import com.example.threedapp.base.setupModelViewer
 import com.google.android.filament.Colors
 
 @Composable
-fun FilamentViewer(scale:Double,startAnimation:Boolean,rotation:Double,sceneIn:String) {
+fun FilamentViewer(
+    scale: Double,
+    startAnimation: Boolean,
+    rotation: Double,
+    verticalRotation: Double,
+    sceneIn: String,
+    sliderValue: Double
+) {
     var modelViewer by remember { mutableStateOf<ModelViewer?>(null) }
 
-    LaunchedEffect(key1 = true){
+    LaunchedEffect(key1 = true) {
         while (true) {
             withFrameNanos { frameTimeNanos ->
                 modelViewer?.render(frameTimeNanos)
@@ -27,24 +34,26 @@ fun FilamentViewer(scale:Double,startAnimation:Boolean,rotation:Double,sceneIn:S
     modelViewer?.scene = scene
     modelViewer?.scale = scale
     modelViewer?.rotation = rotation
+    modelViewer?.verticalRotation = verticalRotation
+    modelViewer?.sliderValue = sliderValue
     modelViewer?.animationSettings(start = startAnimation)
-        asset.entities.find {
-            asset.getName(it)?.startsWith("Wood") ?: false
-        }?.also { entity ->
-            val manager = engine.renderableManager
-            val instance = manager.getInstance(entity)
-            val material = manager.getMaterialInstanceAt(instance, 0)
+    asset.entities.find {
+        asset.getName(it)?.startsWith("Wood") ?: false
+    }?.also { entity ->
+        val manager = engine.renderableManager
+        val instance = manager.getInstance(entity)
+        val material = manager.getMaterialInstanceAt(instance, 0)
 
-            val productColor = Color(1.0f, 1.0f, 1.0f)
+        val productColor = Color(1.0f, 1.0f, 1.0f)
 
-            val r = productColor.red
-            val g = productColor.green
-            val b = productColor.blue
+        val r = productColor.red
+        val g = productColor.green
+        val b = productColor.blue
 
-            material.setParameter(
-                "baseColorFactor", Colors.RgbaType.SRGB, r, g, b, 1.0f
-            )
-        }
+        material.setParameter(
+            "baseColorFactor", Colors.RgbaType.SRGB, r, g, b, 1.0f
+        )
+    }
 
 
     AndroidView({ context ->

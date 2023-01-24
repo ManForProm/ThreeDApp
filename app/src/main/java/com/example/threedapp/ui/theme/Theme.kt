@@ -23,9 +23,16 @@ fun ThreeDAppTheme(
         systemUiController.setStatusBarColor(
             color = BackgroundColorDark
         )
+        systemUiController.setSystemBarsColor(
+            color = BackgroundColorDark
+        )
         DarkColorPalette
     } else {
         systemUiController.setStatusBarColor(
+            color = BackgroundColorLight
+        )
+
+        systemUiController.setSystemBarsColor(
             color = BackgroundColorLight
         )
         LightColorPalette

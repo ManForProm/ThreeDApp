@@ -8,9 +8,7 @@ import com.google.android.filament.*
 import com.google.android.filament.android.DisplayHelper
 import com.google.android.filament.android.UiHelper
 import java.time.Duration
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.sin
+import kotlin.math.*
 import kotlin.random.Random
 
 private const val kNearPlane = 0.5
@@ -26,7 +24,8 @@ class ModelViewer(
 ) {
     val view: View = engine.createView()
     val camera: Camera =
-        engine.createCamera(EntityManager.get().create()).apply { setExposure(kAperture, kShutterSpeed, kSensitivity) }
+        engine.createCamera(EntityManager.get().create())
+            .apply { setExposure(kAperture, kShutterSpeed, kSensitivity) }
     var scene: Scene? = null
         set(value) {
             view.scene = value
@@ -35,6 +34,8 @@ class ModelViewer(
 
     var scale = 4.0
     var rotation = 0.0
+    var verticalRotation = 0.0
+    var sliderValue = 0.0
 
     private val uiHelper: UiHelper = UiHelper(UiHelper.ContextErrorPolicy.DONT_CHECK)
     private var displayHelper: DisplayHelper
@@ -45,7 +46,7 @@ class ModelViewer(
     private var animationOnOff = false
     private var animator = ValueAnimator.ofFloat(0.0f, (2.0 * PI).toFloat())
 
-    val start = 0f
+    private val start = 0f
 
     init {
         view.camera = camera
@@ -71,21 +72,32 @@ class ModelViewer(
             renderer.endFrame()
         }
     }
-    fun animationSettings(start:Boolean, duration: Long = 60_000){
+
+    fun animationSettings(start: Boolean, duration: Long = 60_000) {
         animationDuration = duration.toInt()
         animationOnOff = start
     }
-    private fun animateModelView(){
+
+    private fun animateModelView() {
         animator.interpolator = LinearInterpolator()
         animator.duration = 60_000
         animator.repeatMode = ValueAnimator.RESTART
         animator.repeatCount = ValueAnimator.INFINITE
         animator.addUpdateListener { a ->
-            val v = if(animationOnOff){(a.animatedValue as Float) + start} else 0f
+            val piDivideTwo = (PI / 2).toFloat()
+            val v = if (animationOnOff) (a.animatedValue as Float) + start else 0f
             camera.lookAt(
-                cos(v + rotation) * scale, 0.5, sin(v + rotation) * scale,
-                0.0, 0.0, 0.0,
-                0.0, 1.0, 0.0
+                cos(v + rotation  ) * scale,
+                (if(verticalRotation > piDivideTwo) piDivideTwo
+                else if(verticalRotation < -piDivideTwo) -piDivideTwo
+                else verticalRotation).toDouble() * scale + 0.5,
+                sin(v + rotation )* scale,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0
             )
         }
         animator.start()
@@ -95,7 +107,9 @@ class ModelViewer(
         class AttachListener : android.view.View.OnAttachStateChangeListener {
             var detached = false
 
-            override fun onViewAttachedToWindow(v: android.view.View) { detached = false }
+            override fun onViewAttachedToWindow(v: android.view.View) {
+                detached = false
+            }
 
             override fun onViewDetachedFromWindow(v: android.view.View) {
                 if (!detached) {
