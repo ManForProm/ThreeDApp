@@ -1,4 +1,4 @@
-package com.example.threedapp.screens.filamen
+package com.example.threedapp.base.filamen
 
 import android.view.LayoutInflater
 import android.view.SurfaceView
@@ -6,10 +6,7 @@ import android.widget.FrameLayout
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
-import com.example.threedapp.base.ModelViewer
-import com.example.threedapp.base.scenes
 import com.example.threedapp.R
-import com.example.threedapp.base.setupModelViewer
 import com.google.android.filament.Colors
 
 @Composable

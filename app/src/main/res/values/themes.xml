@@ -2,6 +2,11 @@
 <resources>
 
     <style name="Theme.ThreeDApp" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">@color/purple_700</item>
+        <item name="android:statusBarColor">@color/bluePrimaryLight</item>
+        <item name="android:windowBackground">@drawable/splash_backgroind</item>
+    </style>
+
+    <style name="CustomSplashScreen" parent="Theme.ThreeDApp">
+        <item name="android:windowBackground">@drawable/splash_backgroind</item>
     </style>
 </resources>

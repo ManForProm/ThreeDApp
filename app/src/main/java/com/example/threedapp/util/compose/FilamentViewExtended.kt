@@ -14,7 +14,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.threedapp.screens.filamen.FilamentViewer
+import com.example.threedapp.base.filamen.FilamentViewer
 import com.example.threedapp.ui.theme.Shapes
 import com.example.threedapp.ui.theme.myColors
 
@@ -93,7 +93,7 @@ fun FilamentViewSettings(onClickStartAnimation:() -> Unit){
             onClick = { onClickStartAnimation()
                 buttoState = !buttoState },
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = if(buttoState) MaterialTheme.colors.primary else MaterialTheme.myColors.secondary,
+                backgroundColor = if(buttoState) MaterialTheme.myColors.primary else MaterialTheme.myColors.secondary,
             )
         ) {
             Text(fontFamily = FontFamily.Serif,

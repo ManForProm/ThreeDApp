@@ -5,36 +5,32 @@ import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+
+
+@Composable
+fun changeColorBars(color: Color){
+    val systemUiController = rememberSystemUiController()
+    var barColor by remember { mutableStateOf(color) }
+    systemUiController.setStatusBarColor(
+        color = barColor
+    )
+    systemUiController.setSystemBarsColor(
+        color = barColor
+    )
+}
 
 @Composable
 fun ThreeDAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
-    val systemUiController = rememberSystemUiController()
 
     val colors = if (darkTheme) {
-        systemUiController.setStatusBarColor(
-            color = BackgroundColorDark
-        )
-        systemUiController.setSystemBarsColor(
-            color = BackgroundColorDark
-        )
         DarkColorPalette
     } else {
-        systemUiController.setStatusBarColor(
-            color = BackgroundColorLight
-        )
-
-        systemUiController.setSystemBarsColor(
-            color = BackgroundColorLight
-        )
         LightColorPalette
     }
     CompositionLocalProvider(LocalColors provides colors) {
