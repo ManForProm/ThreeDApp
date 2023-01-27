@@ -50,6 +50,8 @@ data class MyColors(
     val invisible: Color,
     val incorrectColorALittle: Color,
     val correctColorALittle: Color,
+    val reviewColor: Color,
+    val whiteColor: Color,
 
     ) {
     val primary: Color get() = material.primary
@@ -81,6 +83,8 @@ private val DarkColorPalette = MyColors(
     invisible = InvisibaleColor,
     incorrectColorALittle = IncorrectColorALittleDark,
     correctColorALittle = CorrectColorDarkALittle,
+    reviewColor = ReviewColorDark,
+    whiteColor = WhiteColorDark,
 )
 
 private val LightColorPalette = MyColors(
@@ -97,6 +101,8 @@ private val LightColorPalette = MyColors(
     invisible = InvisibaleColor,
     incorrectColorALittle = IncorrectColorALittleLight,
     correctColorALittle = CorrectColorLightALittle,
+    reviewColor = ReviewColorLight,
+    whiteColor = WhiteColorLight,
 )
 val MaterialTheme.myColors: MyColors
     @Composable

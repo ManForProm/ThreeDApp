@@ -5,6 +5,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
@@ -13,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import com.example.threedapp.screens.main.MainScreen
+import com.example.threedapp.screens.settings.SettingsScreen
 import com.example.threedapp.screens.splash.SplashScreen
 import com.example.threedapp.ui.theme.changeColorBars
 import com.example.threedapp.ui.theme.myColors
@@ -43,10 +45,16 @@ fun AppNavHost(
             SplashScreen(navController)
             changeColorBars(color = MaterialTheme.myColors.answeredColor)
         }
+        composable(Screen.Settings.route,
+            enterTransition = { fadeIn() }) {
+            SettingsScreen(navController)
+            changeColorBars(color = MaterialTheme.myColors.answeredColor)
+        }
     }
 }
 
 sealed class Screen(val route: String) {
     object Splash : Screen("splash_screen")
     object Main : Screen("main_screen")
+    object Settings : Screen("settings_screen")
 }
