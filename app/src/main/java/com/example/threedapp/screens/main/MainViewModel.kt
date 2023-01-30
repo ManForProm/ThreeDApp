@@ -12,13 +12,11 @@ class MainViewModel @Inject constructor(private val mainRepository: MainReposito
     override fun obtainIntent(intent: MainIntent) {
         TODO("Not yet implemented")
     }
-
 }
 
 class MainViewModelFactory  @Inject constructor(
     private val mainRepository: MainRepository,
 ) : ViewModelProvider.Factory {
-
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

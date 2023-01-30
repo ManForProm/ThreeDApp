@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -30,7 +31,9 @@ data class Stars(
 fun InAppReview(
     iconReview: ImageVector,
     iconReviewFilled: ImageVector,
-    ratedIn: MutableState<Boolean> = mutableStateOf(false),
+    ratedIn: Boolean= false,
+    inAppReviewByValue: Boolean = false,
+    inAppReviewValue: Float = 0f,
     size: Dp = 10.dp,
     colorIcon: Color,
     modifier: Modifier = Modifier,
@@ -41,8 +44,14 @@ fun InAppReview(
     fourStars:()->Unit = {},
     fiveStars:()->Unit = {},
 ): Boolean {
-    val rated = remember {
-        ratedIn
+    val rated = rememberSaveable {
+        mutableStateOf(ratedIn)
+    }
+    val byValue = remember{
+        mutableStateOf(inAppReviewByValue)
+    }
+    val valueShown = rememberSaveable {
+        mutableStateOf(inAppReviewValue)
     }
     val _size = remember {
        mutableStateOf(size)
@@ -110,48 +119,74 @@ fun InAppReview(
 
         }
     }
+    if (byValue.value){
+        if(valueShown.value > 0.5f && valueShown.value <= 1.5f ) stars.oneStar()
+        if(valueShown.value > 1.5f && valueShown.value <= 2.5f ) stars.twoStars()
+        if(valueShown.value > 2.5f && valueShown.value <= 3.5f ) stars.threeStars()
+        if(valueShown.value > 3.5f && valueShown.value <= 4.5f ) stars.fourStars()
+        if(valueShown.value > 4.5f && valueShown.value <= 5f ) stars.fiveStars()
+    }
     Row(horizontalArrangement = Arrangement.Center, modifier = rowModifier) {
         val review = "review"
         Icon(
-            modifier = modifier.clickable {
-                stars.oneStar()
-
-            }.size(_size.value),
+            modifier = modifier
+                .clickable(
+                    enabled = !inAppReviewByValue
+                ) {
+                    stars.oneStar()
+                }
+                .size(_size.value),
             imageVector = stars.icons.value.oneStarIcon,
             contentDescription = review,
             tint = colorIcon,
         )
         Icon(
-            modifier = modifier.clickable {
+            modifier = modifier
+                .clickable(
+                    enabled = !inAppReviewByValue
+                )  {
 
-                stars.twoStars()
+                    stars.twoStars()
 
-            }.size(_size.value),
+                }
+                .size(_size.value),
             imageVector = stars.icons.value.twoStarsIcon,
             contentDescription = review,
             tint = colorIcon,
         )
         Icon(
-            modifier = modifier.clickable {
-                stars.threeStars()
+            modifier = modifier
+                .clickable(
+                    enabled = !inAppReviewByValue
+                )  {
+                    stars.threeStars()
 
-            }.size(_size.value),
+                }
+                .size(_size.value),
             imageVector = stars.icons.value.threeStarsIcon,
             contentDescription = review,
             tint = colorIcon,
         )
         Icon(
-            modifier = modifier.clickable {
-                stars.fourStars()
-            }.size(_size.value),
+            modifier = modifier
+                .clickable(
+                    enabled = !inAppReviewByValue
+                )  {
+                    stars.fourStars()
+                }
+                .size(_size.value),
             imageVector = stars.icons.value.fourStarsIcon,
             contentDescription = review,
             tint = colorIcon,
         )
         Icon(
-            modifier = modifier.clickable {
-                stars.fiveStars()
-            }.size(_size.value),
+            modifier = modifier
+                .clickable(
+                    enabled = !inAppReviewByValue
+                )  {
+                    stars.fiveStars()
+                }
+                .size(_size.value),
             imageVector = stars.icons.value.fiveStarsIcon,
             contentDescription = review,
             tint = colorIcon,

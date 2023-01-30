@@ -7,6 +7,7 @@ import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -20,10 +21,10 @@ import com.example.threedapp.ui.theme.myColors
 
 @Composable
 fun FilamentViewExtended(scene:String) {
-    var buttonClickOnOffAnim by remember { mutableStateOf(false) }
-    var zoomScale by remember { mutableStateOf(5f) }
-    var rotationHorizontalScale by remember { mutableStateOf(0f) }
-    var rotationVerticalScale by remember { mutableStateOf(0f) }
+    var buttonClickOnOffAnim by rememberSaveable { mutableStateOf(false) }
+    var zoomScale by rememberSaveable { mutableStateOf(5f) }
+    var rotationHorizontalScale by rememberSaveable  { mutableStateOf(0f) }
+    var rotationVerticalScale by rememberSaveable  { mutableStateOf(0f) }
     var sliderVerticalScale by remember { mutableStateOf(0f) }
 
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
