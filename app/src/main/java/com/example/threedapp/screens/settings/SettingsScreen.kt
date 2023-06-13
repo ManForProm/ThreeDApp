@@ -13,16 +13,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import com.example.threedapp.screens.main.MainViewModel
 import com.example.threedapp.screens.main.models.imageSofa
 import com.example.threedapp.screens.main.models.listImages
 import com.example.threedapp.ui.theme.RoundedShapes
 import com.example.threedapp.ui.theme.myColors
 
 @Composable
-fun SettingsScreen(navHostController: NavHostController){
+fun SettingsScreen(navHostController: NavHostController,
+                   settingsViewModel:SettigsScreenViewModel  = viewModel()){
     Column(modifier = Modifier.fillMaxSize().background( MaterialTheme.myColors.background)) {
         ChangeImage()
     }
@@ -55,7 +58,7 @@ fun ImageChoice(imageUrl:String){
                     .data(imageUrl)
                     .crossfade(true)
                     .build(),
-                loading = { CircularProgressIndicator(Modifier.size(10.dp)) },
+                loading = { CircularProgressIndicator(Modifier.size(5.dp)) },
                 contentScale = ContentScale.Fit,
                 contentDescription = "product image"
             )

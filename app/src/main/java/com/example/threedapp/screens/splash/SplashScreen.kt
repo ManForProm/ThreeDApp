@@ -17,10 +17,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.threedapp.Screen
-import com.example.threedapp.ui.theme.PrimaryDark
+import com.example.threedapp.screens.Screen
 import com.example.threedapp.ui.theme.PrimaryLight
-import com.example.threedapp.ui.theme.changeColorBars
 import com.example.threedapp.ui.theme.myColors
 import kotlinx.coroutines.delay
 

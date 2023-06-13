@@ -44,26 +44,29 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import com.example.threedapp.Screen
+import com.example.threedapp.data.features.main.MainRepository
+import com.example.threedapp.screens.Screen
 import com.example.threedapp.screens.main.models.ProductInformation
 import com.example.threedapp.screens.main.models.ProductsList
 import com.example.threedapp.screens.main.models.TabItems
 import com.example.threedapp.screens.main.models.listItemsMainView
+import com.example.threedapp.screens.settings.SettigsScreenViewModel
 import com.example.threedapp.ui.theme.*
 import com.example.threedapp.util.compose.FilamentViewExtended
 import com.example.threedapp.util.compose.InAppReview
 import com.example.threedapp.util.toPrice
 import com.example.threedapp.util.toReview
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
-import javax.inject.Inject
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navHostController: NavHostController) {
+fun MainScreen(navHostController: NavHostController,
+               mainViewModel: MainViewModel) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val bottomBarHeight = 70.dp
     val bottomBarHeightPx = with(LocalDensity.current) { bottomBarHeight.roundToPx().toFloat() }
@@ -615,5 +618,7 @@ fun UtilMainScreen() {
 @Composable
 fun preview() {
     val navHostController = rememberAnimatedNavController()
-    MainScreen(navHostController = navHostController)
+    MainScreen(navHostController = navHostController,
+        MainViewModel("param",MainRepository())
+    )
 }
