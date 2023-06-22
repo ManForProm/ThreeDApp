@@ -9,6 +9,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -19,20 +20,24 @@ import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.example.threedapp.screens.main.MainViewModel
 import com.example.threedapp.screens.main.models.imageSofa
-import com.example.threedapp.screens.main.models.listImages
 import com.example.threedapp.ui.theme.RoundedShapes
 import com.example.threedapp.ui.theme.myColors
+import androidx.compose.runtime.getValue
 
 @Composable
 fun SettingsScreen(navHostController: NavHostController,
-                   settingsViewModel:SettigsScreenViewModel  = viewModel()){
-    Column(modifier = Modifier.fillMaxSize().background( MaterialTheme.myColors.background)) {
-        ChangeImage()
+                    settingsViewModel: SettingsViewModel,
+){
+    val listImages by settingsViewModel.imageList.collectAsState()
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .background(MaterialTheme.myColors.background)) {
+        ChangeImage(listImages)
     }
 }
 
 @Composable
-fun ChangeImage(){
+fun ChangeImage(listImages:List<String>){
     LazyColumn(){
         items(listImages){image ->
             ImageChoice(image)

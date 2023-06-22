@@ -9,14 +9,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.threedapp.screens.main.MainScreen
-import com.example.threedapp.screens.main.MainViewModelFactory
+import com.example.threedapp.screens.main.MainViewModel
+import com.example.threedapp.screens.main.di.DaggerMainScreenComponent
 import com.example.threedapp.screens.settings.SettingsScreen
+import com.example.threedapp.screens.settings.SettingsViewModel
+import com.example.threedapp.screens.settings.di.DaggerSettingsScreenComponent
 import com.example.threedapp.screens.splash.SplashScreen
 import com.example.threedapp.ui.theme.changeColorBars
 import com.example.threedapp.ui.theme.myColors
+import com.example.threedapp.util.compose.daggerViewModel
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -27,8 +30,7 @@ import javax.inject.Inject
 @Composable
 fun AppNavHost(
     navController: NavHostController = rememberAnimatedNavController(),
-    startDestination: String = Screen.Splash.route,
-    mainViewModelFactory: MainViewModelFactory.Factory
+    startDestination: String = Screen.Splash.route
 ) {
     AnimatedNavHost(
         navController = navController,
@@ -39,8 +41,12 @@ fun AppNavHost(
             Screen.Main.route,
             enterTransition = { fadeIn(animationSpec = tween(1000)) }
         ) {
+            val mainViewModel:MainViewModel = daggerViewModel{
+                DaggerMainScreenComponent.builder().build().getViewModel()
+            }
             MainScreen(navController,
-            mainViewModel = viewModel(factory = mainViewModelFactory.create("param")))
+            mainViewModel = mainViewModel,
+            )
             changeColorBars(color = MaterialTheme.myColors.background)
         }
         composable(
@@ -51,8 +57,12 @@ fun AppNavHost(
         }
         composable(
             Screen.Settings.route,
-            enterTransition = { fadeIn() }) {
-            SettingsScreen(navController)
+            enterTransition = { fadeIn() })
+        {
+            val settingsViewModel:SettingsViewModel = daggerViewModel{
+                DaggerSettingsScreenComponent.builder().build().getViewModel()
+            }
+            SettingsScreen(navController, settingsViewModel = settingsViewModel )
             changeColorBars(color = MaterialTheme.myColors.answeredColor)
         }
     }

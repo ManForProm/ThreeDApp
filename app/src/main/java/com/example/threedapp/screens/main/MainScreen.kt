@@ -1,6 +1,7 @@
 package com.example.threedapp.screens.main
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -48,13 +49,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import com.example.threedapp.data.features.main.MainRepository
+import com.example.threedapp.data.features.main.MainRepositoryImpl
 import com.example.threedapp.screens.Screen
 import com.example.threedapp.screens.main.models.ProductInformation
 import com.example.threedapp.screens.main.models.ProductsList
 import com.example.threedapp.screens.main.models.TabItems
-import com.example.threedapp.screens.main.models.listItemsMainView
-import com.example.threedapp.screens.settings.SettigsScreenViewModel
 import com.example.threedapp.ui.theme.*
 import com.example.threedapp.util.compose.FilamentViewExtended
 import com.example.threedapp.util.compose.InAppReview
@@ -67,13 +66,13 @@ import kotlin.math.roundToInt
 @Composable
 fun MainScreen(navHostController: NavHostController,
                mainViewModel: MainViewModel) {
+    val listItemsMain by mainViewModel.furnitureList.collectAsState()
+    val listItemsExplore by mainViewModel.furnitureListExplore.collectAsState()
+
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val bottomBarHeight = 70.dp
     val bottomBarHeightPx = with(LocalDensity.current) { bottomBarHeight.roundToPx().toFloat() }
     val bottomBarOffsetHeightPx = remember { mutableStateOf(0f) }
-
-    lateinit var factory: Lazy<MainViewModelFactory.Factory>
-
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
@@ -114,7 +113,7 @@ fun MainScreen(navHostController: NavHostController,
         ProductsList(
             ProductsList(
                 id = "1",
-                productsList = listItemsMainView
+                productsList = listItemsMain
             ),
             modifier = Modifier
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
@@ -123,7 +122,7 @@ fun MainScreen(navHostController: NavHostController,
             preContent = {
                 ExploreMainScreen(ProductsList(
                     id = "2",
-                    productsList = listItemsMainView
+                    productsList = listItemsExplore
                 ))
                 TabProductsList()
             },
@@ -619,6 +618,6 @@ fun UtilMainScreen() {
 fun preview() {
     val navHostController = rememberAnimatedNavController()
     MainScreen(navHostController = navHostController,
-        MainViewModel("param",MainRepository())
+        MainViewModel(MainRepositoryImpl())
     )
 }
