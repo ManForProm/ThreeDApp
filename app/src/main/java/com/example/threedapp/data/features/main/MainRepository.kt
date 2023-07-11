@@ -21,6 +21,7 @@ class MainRepositoryImpl @Inject constructor() : MainRepository {
     val listItemsExploreMainView = listOf(
 
         ProductInformation(
+            id = 0,
             price = Random.nextDouble(),
             name = "Wood Cabinet",
             type = TabItems.Cabinets,
@@ -30,6 +31,7 @@ class MainRepositoryImpl @Inject constructor() : MainRepository {
             usersReview = Random.nextFloat(),
         ),
         ProductInformation(
+            id = 1,
             price = Random.nextDouble(),
             name = "Comfy bed",
             type = TabItems.Beds,
@@ -39,6 +41,7 @@ class MainRepositoryImpl @Inject constructor() : MainRepository {
             usersReview = Random.nextFloat(),
         ),
         ProductInformation(
+            id = 2,
             price = Random.nextDouble(),
             name = "Wood Table",
             type = TabItems.Tablets,
@@ -49,6 +52,7 @@ class MainRepositoryImpl @Inject constructor() : MainRepository {
             usersReview = Random.nextFloat(),
         ),
         ProductInformation(
+            id = 3,
             price = Random.nextDouble(),
             name = "Queen's bed",
             type = TabItems.Beds,
@@ -58,6 +62,7 @@ class MainRepositoryImpl @Inject constructor() : MainRepository {
             usersReview = Random.nextFloat(),
         ),
         ProductInformation(
+            id = 4,
             price = Random.nextDouble(),
             name = "Chair for studing",
             type = TabItems.Chairs,
@@ -67,6 +72,7 @@ class MainRepositoryImpl @Inject constructor() : MainRepository {
             usersReview = Random.nextFloat(),
         ),
         ProductInformation(
+            id = 5,
             price = Random.nextDouble(),
             name = "Velvet Sofa",
             type = TabItems.Sofas,
@@ -76,6 +82,7 @@ class MainRepositoryImpl @Inject constructor() : MainRepository {
             usersReview = Random.nextFloat(),
         ),
         ProductInformation(
+            id = 6,
             price = Random.nextDouble(),
             name = "Wooden Chair",
             type = TabItems.Chairs,
@@ -85,6 +92,7 @@ class MainRepositoryImpl @Inject constructor() : MainRepository {
             usersReview = Random.nextFloat(),
         ),
         ProductInformation(
+            id = 7,
             price = Random.nextDouble(),
             name = "Leather Sofa",
             type = TabItems.Sofas,
@@ -97,6 +105,7 @@ class MainRepositoryImpl @Inject constructor() : MainRepository {
             usersReview = Random.nextFloat(),
         ),
         ProductInformation(
+            id = 8,
             price = Random.nextDouble(),
             name = "Compfy Sofa",
             type = TabItems.Sofas,
@@ -106,6 +115,7 @@ class MainRepositoryImpl @Inject constructor() : MainRepository {
             usersReview = Random.nextFloat(),
         ),
         ProductInformation(
+            id = 9,
             price = Random.nextDouble(),
             name = "Velvet chair",
             type = TabItems.Chairs,
@@ -115,6 +125,7 @@ class MainRepositoryImpl @Inject constructor() : MainRepository {
             usersReview = Random.nextFloat(),
         ),
         ProductInformation(
+            id = 10,
             price = Random.nextDouble(),
             name = "Comfy chair",
             type = TabItems.Chairs,
@@ -127,6 +138,7 @@ class MainRepositoryImpl @Inject constructor() : MainRepository {
 
     val listItemsMainView = listOf(
         ProductInformation(
+            id = 0,
             price = Random.nextDouble(),
             name = "Velvet Sofa",
             type = TabItems.Sofas,
@@ -136,6 +148,7 @@ class MainRepositoryImpl @Inject constructor() : MainRepository {
             usersReview = Random.nextFloat(),
         ),
         ProductInformation(
+            id = 1,
             price = Random.nextDouble(),
             name = "Wooden Chair",
             type = TabItems.Chairs,
@@ -145,6 +158,7 @@ class MainRepositoryImpl @Inject constructor() : MainRepository {
             usersReview = Random.nextFloat(),
         ),
         ProductInformation(
+            id = 2,
             price = Random.nextDouble(),
             name = "Leather Sofa",
             type = TabItems.Sofas,
@@ -157,6 +171,7 @@ class MainRepositoryImpl @Inject constructor() : MainRepository {
             usersReview = Random.nextFloat(),
         ),
         ProductInformation(
+            id = 3,
             price = Random.nextDouble(),
             name = "Compfy Sofa",
             type = TabItems.Sofas,
@@ -166,6 +181,7 @@ class MainRepositoryImpl @Inject constructor() : MainRepository {
             usersReview = Random.nextFloat(),
         ),
         ProductInformation(
+            id = 4,
             price = Random.nextDouble(),
             name = "Velvet chair",
             type = TabItems.Chairs,
@@ -175,6 +191,7 @@ class MainRepositoryImpl @Inject constructor() : MainRepository {
             usersReview = Random.nextFloat(),
         ),
         ProductInformation(
+            id = 5,
             price = Random.nextDouble(),
             name = "Comfy chair",
             type = TabItems.Chairs,
@@ -184,6 +201,7 @@ class MainRepositoryImpl @Inject constructor() : MainRepository {
             usersReview = Random.nextFloat(),
         ),
         ProductInformation(
+            id = 6,
             price = Random.nextDouble(),
             name = "Wood Table",
             type = TabItems.Tablets,
@@ -193,6 +211,7 @@ class MainRepositoryImpl @Inject constructor() : MainRepository {
             usersReview = Random.nextFloat(),
         ),
         ProductInformation(
+            id = 7,
             price = Random.nextDouble(),
             name = "Wood Cabinet",
             type = TabItems.Cabinets,
@@ -202,6 +221,7 @@ class MainRepositoryImpl @Inject constructor() : MainRepository {
             usersReview = Random.nextFloat(),
         ),
         ProductInformation(
+            id = 8,
             price = Random.nextDouble(),
             name = "Comfy bed",
             type = TabItems.Beds,
@@ -211,6 +231,7 @@ class MainRepositoryImpl @Inject constructor() : MainRepository {
             usersReview = Random.nextFloat(),
         ),
         ProductInformation(
+            id = 9,
             price = Random.nextDouble(),
             name = "Queen's bed",
             type = TabItems.Beds,
@@ -220,6 +241,7 @@ class MainRepositoryImpl @Inject constructor() : MainRepository {
             usersReview = Random.nextFloat(),
         ),
         ProductInformation(
+            id = 10,
             price = Random.nextDouble(),
             name = "Chair for studing",
             type = TabItems.Chairs,

@@ -21,6 +21,7 @@ import androidx.compose.material.icons.sharp.Notifications
 import androidx.compose.material.icons.sharp.Search
 import androidx.compose.material.icons.twotone.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.*
@@ -30,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -47,12 +49,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.Navigator
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.example.threedapp.data.features.main.MainRepositoryImpl
 import com.example.threedapp.screens.Screen
+import com.example.threedapp.screens.main.models.MainSnackBarParams
+import com.example.threedapp.screens.main.models.MainSnackBarType
+import com.example.threedapp.screens.main.models.MainSnackbarState
 import com.example.threedapp.screens.main.models.ProductInformation
 import com.example.threedapp.screens.main.models.ProductsList
+import com.example.threedapp.screens.main.models.ProvidedParametrsMainScreen
 import com.example.threedapp.screens.main.models.TabItems
 import com.example.threedapp.ui.theme.*
 import com.example.threedapp.util.compose.FilamentViewExtended
@@ -60,15 +67,21 @@ import com.example.threedapp.util.compose.InAppReview
 import com.example.threedapp.util.toPrice
 import com.example.threedapp.util.toReview
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+
+val mainCompositionProvider =
+    compositionLocalOf<ProvidedParametrsMainScreen> { error("have no one instance of main viewmodel") }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navHostController: NavHostController,
-               mainViewModel: MainViewModel) {
+fun MainScreen(
+    navHostController: NavHostController,
+    mainViewModel: MainViewModel
+) {
     val listItemsMain by mainViewModel.furnitureList.collectAsState()
     val listItemsExplore by mainViewModel.furnitureListExplore.collectAsState()
-
+    val snackbarParametrs by mainViewModel.snackBarParams.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val bottomBarHeight = 70.dp
     val bottomBarHeightPx = with(LocalDensity.current) { bottomBarHeight.roundToPx().toFloat() }
@@ -85,51 +98,149 @@ fun MainScreen(navHostController: NavHostController,
             }
         }
     }
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colors.background),
-        topBar = {
-            androidx.compose.material3.TopAppBar(title = {},
-                modifier = Modifier
-                    .padding(5.dp)
-                    .clip(RoundedShapes.small),
-                scrollBehavior = scrollBehavior,
-                actions = {
-                    HeaderMainScreen(navHostController = navHostController)
-                })
-        },
-        bottomBar = {
-            BottomAppBar(modifier = Modifier
-                .height(bottomBarHeight)
-                .padding(5.dp)
-                .offset { IntOffset(x = 0, y = -bottomBarOffsetHeightPx.value.roundToInt()) }
-                .clip(RoundedShapes.small),
-                backgroundColor = MaterialTheme.myColors.whiteColor) {
-                TabsNavigationBar(navHostController = navHostController)
+    CompositionLocalProvider(
+        mainCompositionProvider provides ProvidedParametrsMainScreen(
+            viewModel = mainViewModel,
+        )
+    ) {
+        MainScreenChanger(navHostController = navHostController)
+        Scaffold(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colors.background),
+            topBar = {
+                androidx.compose.material3.TopAppBar(title = {},
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .clip(RoundedShapes.small),
+                    scrollBehavior = scrollBehavior,
+                    actions = {
+                        HeaderMainScreen(navHostController = navHostController)
+                    })
+            },
+            bottomBar = {
+                Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Bottom) {
+                    MainScreenSnackbar(
+                        modifier = Modifier,
+                        snackbarParametrs = snackbarParametrs
+                    )
+                    BottomAppBar(modifier = Modifier
+                        .height(bottomBarHeight)
+                        .padding(5.dp)
+                        .offset {
+                            IntOffset(
+                                x = 0,
+                                y = -bottomBarOffsetHeightPx.value.roundToInt()
+                            )
+                        }
+                        .clip(RoundedShapes.small),
+                        backgroundColor = MaterialTheme.myColors.whiteColor) {
+
+                        TabsNavigationBar(navHostController = navHostController)
+                    }
+                }
+            }
+        ) { padding ->
+            Box(modifier = Modifier.fillMaxSize()) {
+                ProductsList(
+                    ProductsList(
+                        id = "1",
+                        productsList = listItemsMain,
+                    ),
+                    modifier = Modifier
+                        .nestedScroll(scrollBehavior.nestedScrollConnection)
+                        .nestedScroll(nestedScrollConnection),
+                    padding = padding,
+                    preContent = {
+                        ExploreMainScreen(
+                            ProductsList(
+                                id = "2",
+                                productsList = listItemsExplore
+                            )
+                        )
+                        TabProductsList()
+                    },
+                    postContent = {
+                        UtilMainScreen()
+                    }
+                )
             }
         }
-    ) { padding ->
-        ProductsList(
-            ProductsList(
-                id = "1",
-                productsList = listItemsMain
-            ),
-            modifier = Modifier
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .nestedScroll(nestedScrollConnection),
-            padding = padding,
-            preContent = {
-                ExploreMainScreen(ProductsList(
-                    id = "2",
-                    productsList = listItemsExplore
-                ))
-                TabProductsList()
-            },
-            postContent = {
-                UtilMainScreen()
-            },
-        )
+    }
+}
+@Composable
+fun MainScreenChanger(navHostController: NavHostController){
+    val viewModel = mainCompositionProvider.current.viewModel
+    LaunchedEffect(key1 = viewModel.screenChangerParams.collectAsState().value ){
+        navHostController.navigate(Screen.Detail.route )
+    }
+}
+@Composable
+fun MainScreenSnackbar(modifier: Modifier = Modifier,
+                       errorMessage:String = "error is occured",
+                       snackbarParametrs: MainSnackBarParams =
+                           MainSnackBarParams("Placeholder message",
+                               MainSnackbarState(MainSnackBarType.Standart,0))){
+    val viewModel =  mainCompositionProvider.current.viewModel
+    val name = viewModel.furnitureList.collectAsState().value[snackbarParametrs.snackbarState.id].name
+    com.example.threedapp.util.compose.Snackbar(message = snackbarParametrs.massage,
+        snackbarState = snackbarParametrs.snackbarState,
+        snackBarShowed = {viewModel.mainFuncs.snackBarShowed()}){
+        ("$name ${snackbarParametrs.massage}").apply {
+            when(snackbarParametrs.snackbarState.operation){
+                MainSnackBarType.Standart -> standartSnackbar(content = this,)
+                MainSnackBarType.AddToBag-> addToBagSnackbar(content = this,)
+                MainSnackBarType.AddToFavorite-> addToFavoriteSnackbar(content = this)
+                MainSnackBarType.RemoveFromBag -> addToBagSnackbar(content = this,
+                    backgroundColor = MaterialTheme.myColors.incorrectColor)
+                MainSnackBarType.RemoveFromFavorite -> addToFavoriteSnackbar(content = this,
+                    backgroundColor = MaterialTheme.myColors.incorrectColor)
+            }
+        }
+    }
+}
+
+@Composable
+fun addToBagSnackbar(
+    modifier: Modifier = Modifier,
+    title:String = "",
+    backgroundColor: Color = MaterialTheme.myColors.correctColor,
+    content: String,
+    onAction: () -> Unit = {}
+    
+){
+    Snackbar(elevation = 1.dp,
+    backgroundColor = backgroundColor) {
+        Text(content)
+    }
+}
+
+@Composable
+fun addToFavoriteSnackbar(
+    modifier: Modifier = Modifier,
+    title:String = "",
+    backgroundColor: Color = MaterialTheme.myColors.correctColor,
+    content: String,
+    onAction: () -> Unit = {}
+
+){
+    Snackbar(elevation = 1.dp,
+        backgroundColor = backgroundColor) {
+        Text(content)
+    }
+}
+
+@Composable
+fun standartSnackbar(
+    modifier: Modifier = Modifier,
+    title:String = "",
+    content: String,
+    onAction: () -> Unit = {}
+
+){
+    Snackbar(elevation = 1.dp,
+        backgroundColor = MaterialTheme.myColors.correctColor) {
+
     }
 }
 
@@ -248,12 +359,16 @@ fun ExploreMainScreen(exploreScreenList: ProductsList) {
 @Composable
 fun ItemCard(itemCardInformation: ProductInformation) {
     val textColor = MaterialTheme.myColors.background
+    val viewModel = mainCompositionProvider.current.viewModel
     val textWeight = FontWeight.Light
     Card(
         modifier = Modifier
             .width(150.dp)
             .height(170.dp)
-            .padding(horizontal = 10.dp),
+            .padding(horizontal = 10.dp)
+            .clickable {
+                viewModel.mainFuncs.onClickCard(itemCardInformation.id)
+            },
         shape = RoundedShapes.medium,
         elevation = 2.dp
     ) {
@@ -376,7 +491,7 @@ fun ProductsList(
 
         items(items = productsInfornation.productsList) { product ->
             Box(modifier = Modifier.padding(20.dp)) {
-                ProductRepresentationCard(product)
+                ProductRepresentationCard(product,)
             }
         }
 
@@ -385,16 +500,10 @@ fun ProductsList(
 }
 
 @Composable
-fun ProductRepresentationCard(product: ProductInformation) {
-    val funcs = object {
-        fun addToBag() {}
-
-        fun addToFavorite() {}
-
-        fun removeFromBag() {}
-
-        fun removeFromFavorite() {}
-    }
+fun ProductRepresentationCard(
+    product: ProductInformation,
+    funcs: ProductRepCardFuncs = mainCompositionProvider.current.viewModel.mainFuncs,
+) {
 
     Box(
         modifier = Modifier, contentAlignment = Alignment.BottomEnd
@@ -413,6 +522,7 @@ fun ProductRepresentationCard(product: ProductInformation) {
                         width = 350.dp.toPx(),
                         height = 150.dp.toPx()
                     )
+
                     else -> Size(width = 240.dp.toPx(), height = 120.dp.toPx())
                 },
                 topLeft = when (localConfig.orientation) {
@@ -420,6 +530,7 @@ fun ProductRepresentationCard(product: ProductInformation) {
                         x = localConfig.screenWidthDp.dp.toPx() - 130.dp.toPx(),
                         y = 50.dp.toPx()
                     )
+
                     else -> Offset(
                         x = localConfig.screenWidthDp.dp.toPx() - 150.dp.toPx(),
                         y = 50.dp.toPx()
@@ -494,8 +605,13 @@ fun ProductRepresentationCard(product: ProductInformation) {
                     )
                 }
                 Row {
-                    AddToBag(funcs::addToBag, funcs::removeFromBag)
-                    AddToFavorite(funcs::addToFavorite, funcs::removeFromFavorite)
+                    AddToBag(id = product.id,
+                        funcs::addToBag,
+                        funcs::removeFromBag,
+                    )
+                    AddToFavorite(id = product.id,
+                        funcs::addToFavorite,
+                        funcs::removeFromFavorite)
                 }
             }
         }
@@ -521,7 +637,11 @@ fun ProductRepresentationCard(product: ProductInformation) {
 }
 
 @Composable
-fun AddToBag(addToBag: () -> Unit, removeFromBag: () -> Unit) {
+fun AddToBag(
+    id:Int,
+    addToBag: (id:Int) -> Unit,
+    removeFromBag: (id:Int) -> Unit,
+) {
     var state by rememberSaveable {
         mutableStateOf(false)
     }
@@ -529,7 +649,7 @@ fun AddToBag(addToBag: () -> Unit, removeFromBag: () -> Unit) {
         modifier = Modifier
             .padding(5.dp)
             .clickable {
-                if (!state) addToBag() else removeFromBag()
+                if (!state) addToBag(id) else removeFromBag(id)
                 state = !state
             },
         backgroundColor = MaterialTheme.myColors.whiteColor,
@@ -548,7 +668,9 @@ fun AddToBag(addToBag: () -> Unit, removeFromBag: () -> Unit) {
 }
 
 @Composable
-fun AddToFavorite(addToFavorite: () -> Unit, removeFromFvorite: () -> Unit) {
+fun AddToFavorite(id:Int,
+                  addToFavorite: (id:Int) -> Unit,
+                  removeFromFvorite: (id:Int) -> Unit) {
     var state by rememberSaveable {
         mutableStateOf(false)
     }
@@ -557,7 +679,7 @@ fun AddToFavorite(addToFavorite: () -> Unit, removeFromFvorite: () -> Unit) {
             .padding(5.dp)
             .clickable {
 
-                if (!state) addToFavorite() else removeFromFvorite()
+                if (!state) addToFavorite(id) else removeFromFvorite(id)
                 state = !state
             },
         backgroundColor = MaterialTheme.myColors.whiteColor,
@@ -617,7 +739,8 @@ fun UtilMainScreen() {
 @Composable
 fun preview() {
     val navHostController = rememberAnimatedNavController()
-    MainScreen(navHostController = navHostController,
+    MainScreen(
+        navHostController = navHostController,
         MainViewModel(MainRepositoryImpl())
     )
 }

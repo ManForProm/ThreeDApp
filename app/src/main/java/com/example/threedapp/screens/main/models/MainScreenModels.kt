@@ -3,8 +3,7 @@ package com.example.threedapp.screens.main.models
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
-import com.example.threedapp.ui.theme.*
-import kotlin.random.Random
+import com.example.threedapp.screens.main.MainViewModel
 
 sealed class TabItems(val name: String) {
     companion object {
@@ -26,6 +25,7 @@ sealed class TabItems(val name: String) {
 data class ItemCardColor(val primary: Color, val secondary: Color)
 
 data class ProductInformation(
+    val id: Int,
     val price: Double,
     val name: String,
     val type: TabItems,
@@ -35,5 +35,14 @@ data class ProductInformation(
     val usersReview: Float
 )
 data class ProductsList(val id:String,val productsList:List<ProductInformation>)
+
+data class ProvidedParametrsMainScreen(val viewModel: MainViewModel,)
+data class MainSnackBarParams( val massage:String, val snackbarState: MainSnackbarState,)
+
+data class MainSnackbarState(val operation:MainSnackBarType,val id: Int)
+enum class MainSnackBarType{
+    AddToBag,AddToFavorite,RemoveFromBag,RemoveFromFavorite,Standart
+}
+data class ScreenChangerModel(val id: Int,)
 
 var imageSofa = mutableStateOf("https://png.pngtree.com/png-clipart/20201209/big/pngtree-sofa-png-image_5633953.png")

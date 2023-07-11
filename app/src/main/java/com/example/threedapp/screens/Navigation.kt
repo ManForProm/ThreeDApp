@@ -9,7 +9,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavHostController
+import com.example.threedapp.screens.detail.DetailScreen
+import com.example.threedapp.screens.detail.DetailViewModel
+import com.example.threedapp.screens.detail.di.DaggerDetailScreenComponent
 import com.example.threedapp.screens.main.MainScreen
 import com.example.threedapp.screens.main.MainViewModel
 import com.example.threedapp.screens.main.di.DaggerMainScreenComponent
@@ -41,11 +45,12 @@ fun AppNavHost(
             Screen.Main.route,
             enterTransition = { fadeIn(animationSpec = tween(1000)) }
         ) {
-            val mainViewModel:MainViewModel = daggerViewModel{
+            val mainViewModel: MainViewModel = daggerViewModel {
                 DaggerMainScreenComponent.builder().build().getViewModel()
             }
-            MainScreen(navController,
-            mainViewModel = mainViewModel,
+            MainScreen(
+                navController,
+                mainViewModel = mainViewModel,
             )
             changeColorBars(color = MaterialTheme.myColors.background)
         }
@@ -59,11 +64,25 @@ fun AppNavHost(
             Screen.Settings.route,
             enterTransition = { fadeIn() })
         {
-            val settingsViewModel:SettingsViewModel = daggerViewModel{
+            val settingsViewModel: SettingsViewModel = daggerViewModel {
                 DaggerSettingsScreenComponent.builder().build().getViewModel()
             }
-            SettingsScreen(navController, settingsViewModel = settingsViewModel )
+            SettingsScreen(navController, settingsViewModel = settingsViewModel)
             changeColorBars(color = MaterialTheme.myColors.answeredColor)
+        }
+        composable(
+            Screen.Detail.route,
+            enterTransition = { fadeIn() }
+        ) {
+            val detailViewModel: DetailViewModel = daggerViewModel {
+                DaggerDetailScreenComponent.builder().build().getViewModel()
+            }
+            DetailScreen(
+                navController,
+                viewModel = detailViewModel,
+                id = 1,
+            )
+            changeColorBars(color = MaterialTheme.myColors.background)
         }
     }
 }
@@ -72,4 +91,5 @@ sealed class Screen(val route: String) {
     object Splash : Screen("splash_screen")
     object Main : Screen("main_screen")
     object Settings : Screen("settings_screen")
+    object Detail : Screen("detail_screen")
 }
