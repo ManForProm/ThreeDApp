@@ -1,7 +1,7 @@
 package com.example.threedapp.screens.main
 
 import android.content.res.Configuration
-import android.util.Log
+import android.net.Uri
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -21,7 +21,6 @@ import androidx.compose.material.icons.sharp.Notifications
 import androidx.compose.material.icons.sharp.Search
 import androidx.compose.material.icons.twotone.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.*
@@ -47,28 +46,32 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.Navigator
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.example.threedapp.data.features.main.MainRepositoryImpl
-import com.example.threedapp.screens.Screen
+import com.example.threedapp.screens.main.models.ItemCardColor
+import com.example.threedapp.screens.navigation.Screen
 import com.example.threedapp.screens.main.models.MainSnackBarParams
 import com.example.threedapp.screens.main.models.MainSnackBarType
 import com.example.threedapp.screens.main.models.MainSnackbarState
 import com.example.threedapp.screens.main.models.ProductInformation
 import com.example.threedapp.screens.main.models.ProductsList
 import com.example.threedapp.screens.main.models.ProvidedParametrsMainScreen
+import com.example.threedapp.screens.main.models.ScreenChangerModel
 import com.example.threedapp.screens.main.models.TabItems
+import com.example.threedapp.screens.main.models.imageSofa
 import com.example.threedapp.ui.theme.*
 import com.example.threedapp.util.compose.FilamentViewExtended
 import com.example.threedapp.util.compose.InAppReview
+import com.example.threedapp.util.toColor
 import com.example.threedapp.util.toPrice
 import com.example.threedapp.util.toReview
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
-import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+//import com.google.gson.Gson
 import kotlin.math.roundToInt
+import kotlin.random.Random
 
 val mainCompositionProvider =
     compositionLocalOf<ProvidedParametrsMainScreen> { error("have no one instance of main viewmodel") }
@@ -171,9 +174,24 @@ fun MainScreen(
 @Composable
 fun MainScreenChanger(navHostController: NavHostController){
     val viewModel = mainCompositionProvider.current.viewModel
-    LaunchedEffect(key1 = viewModel.screenChangerParams.collectAsState().value ){
-        navHostController.navigate(Screen.Detail.route )
+//    val key = viewModel.screenChangerParams.collectAsState().value
+    val inf = ProductInformation(
+        id = 0,
+        price = Random.nextDouble(),
+        name = "Wood Cabinet",
+        type = TabItems.Cabinets,
+        mainColors = ItemCardColor(primary = AnsweredColorLight.value, secondary = AnsweredColorDark.value),
+        discription = "Sofa combines inspiration from the middle of the century with touches of new glam.",
+        image = imageSofa,
+        usersReview = Random.nextFloat(),
+    )
+//    val infJson = Uri.encode(Gson().toJson(inf))
+    val nav = object:NavScreenChanger {
+        override fun navigate(route:Screen,inf:ProductInformation ) {
+            navHostController.navigate( route.route + "/${Uri.encode(Json.encodeToString(ProductInformation.serializer(),inf))}")
+        }
     }
+    viewModel.sendIntent.getNavigationControl(nav)
 }
 @Composable
 fun MainScreenSnackbar(modifier: Modifier = Modifier,
@@ -348,7 +366,7 @@ fun ExploreMainScreen(exploreScreenList: ProductsList) {
         )
         LazyRow {
             items(items = exploreScreenList.productsList) { itemInformation ->
-                ItemCard(itemInformation)
+                ExploreItemCard(itemInformation)
             }
         }
 
@@ -357,7 +375,7 @@ fun ExploreMainScreen(exploreScreenList: ProductsList) {
 
 
 @Composable
-fun ItemCard(itemCardInformation: ProductInformation) {
+fun ExploreItemCard(itemCardInformation: ProductInformation) {
     val textColor = MaterialTheme.myColors.background
     val viewModel = mainCompositionProvider.current.viewModel
     val textWeight = FontWeight.Light
@@ -367,7 +385,7 @@ fun ItemCard(itemCardInformation: ProductInformation) {
             .height(170.dp)
             .padding(horizontal = 10.dp)
             .clickable {
-                viewModel.mainFuncs.onClickCard(itemCardInformation.id)
+                viewModel.mainFuncs.onClickExploreCard(itemCardInformation.id)
             },
         shape = RoundedShapes.medium,
         elevation = 2.dp
@@ -381,13 +399,13 @@ fun ItemCard(itemCardInformation: ProductInformation) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .background(itemCardInformation.mainColors.secondary)
+                    .background(itemCardInformation.mainColors.secondary.toColor())
             )
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .background(itemCardInformation.mainColors.primary)
+                    .background(itemCardInformation.mainColors.primary.toColor())
             )
         }
         Box(
@@ -398,7 +416,7 @@ fun ItemCard(itemCardInformation: ProductInformation) {
             SubcomposeAsyncImage(
                 modifier = Modifier.fillMaxSize(),
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(itemCardInformation.image.value)
+                    .data(itemCardInformation.image)
                     .crossfade(true)
                     .build(),
                 loading = { CircularProgressIndicator(Modifier.size(10.dp)) },
@@ -625,7 +643,7 @@ fun ProductRepresentationCard(
             SubcomposeAsyncImage(
                 modifier = Modifier.fillMaxSize(),
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(product.image.value)
+                    .data(product.image)
                     .crossfade(true)
                     .build(),
                 loading = { CircularProgressIndicator(Modifier.size(10.dp)) },
@@ -647,15 +665,17 @@ fun AddToBag(
     }
     Card(
         modifier = Modifier
-            .padding(5.dp)
-            .clickable {
-                if (!state) addToBag(id) else removeFromBag(id)
-                state = !state
-            },
+            .padding(5.dp),
         backgroundColor = MaterialTheme.myColors.whiteColor,
         shape = RoundedCornerShape(15.dp),
         elevation = 5.dp
     ) {
+        Box(modifier = Modifier
+            .fillMaxHeight()
+            .clickable {
+                if (!state) addToBag(id) else removeFromBag(id)
+                state = !state
+            }){
         Icon(
             modifier = Modifier
                 .size(45.dp)
@@ -664,6 +684,7 @@ fun AddToBag(
             contentDescription = "add to bag",
             tint = if (state) MaterialTheme.myColors.primary else MaterialTheme.myColors.secondary
         )
+        }
     }
 }
 
@@ -676,24 +697,27 @@ fun AddToFavorite(id:Int,
     }
     Card(
         modifier = Modifier
-            .padding(5.dp)
-            .clickable {
-
-                if (!state) addToFavorite(id) else removeFromFvorite(id)
-                state = !state
-            },
+            .padding(5.dp),
         backgroundColor = MaterialTheme.myColors.whiteColor,
         shape = RoundedCornerShape(15.dp),
         elevation = 5.dp
     ) {
-        Icon(
-            modifier = Modifier
-                .size(45.dp)
-                .padding(10.dp),
-            imageVector = if (state) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-            contentDescription = "add to favorite",
-            tint = if (state) MaterialTheme.myColors.primary else MaterialTheme.myColors.secondary
-        )
+        Box(modifier = Modifier
+            .fillMaxHeight()
+            .clickable {
+
+                if (!state) addToFavorite(id) else removeFromFvorite(id)
+                state = !state
+            }) {
+            Icon(
+                modifier = Modifier
+                    .size(45.dp)
+                    .padding(10.dp),
+                imageVector = if (state) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                contentDescription = "add to favorite",
+                tint = if (state) MaterialTheme.myColors.primary else MaterialTheme.myColors.secondary
+            )
+        }
     }
 }
 

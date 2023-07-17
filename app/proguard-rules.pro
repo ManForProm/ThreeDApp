@@ -11,7 +11,11 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
-
+-if class *
+-keepclasseswithmembers class <1> {
+    <init>(...);
+    @com.google.gson.annotations.SerializedName <fields>;
+}
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
 #-keepattributes SourceFile,LineNumberTable

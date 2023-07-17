@@ -7,7 +7,6 @@ import com.example.threedapp.di.DaggerAppComponent
 import com.example.threedapp.base.IntentHendler
 
 class ThreeDAplication:Application() {
-
     lateinit var appComponent: AppComponent
         private set
 
