@@ -1,23 +1,24 @@
 package com.example.threedapp.di
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.example.threedapp.MainActivity
-import com.example.threedapp.screens.main.MainViewModel
-import dagger.Binds
+import com.example.threedapp.screens.main.models.TabItems
+//import com.example.threedapp.util.SealedTypeAdapterFactory
+//import com.google.gson.Gson
+//import com.google.gson.GsonBuilder
 import dagger.Component
-import dagger.MapKey
 import dagger.Module
-import dagger.multibindings.IntoMap
-import kotlin.reflect.KClass
+import dagger.Provides
 
 @Component(modules = [AppModule::class])
 interface AppComponent {
     fun inject(mainActivity: MainActivity)
+//    fun provideGson():Gson
 
 }
 
 @Module()
 object AppModule{
-
+//    @Provides
+//    fun provideGson():Gson = GsonBuilder().registerTypeAdapter(TabItems::class.java,
+//        SealedTypeAdapterFactory.of(TabItems::class)).create()
 }

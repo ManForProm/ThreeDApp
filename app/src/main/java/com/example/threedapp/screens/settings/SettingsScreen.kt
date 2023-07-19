@@ -53,7 +53,7 @@ fun ImageChoice(imageUrl:String){
                 .width(150.dp)
                 .height(170.dp)
                 .padding(vertical = 10.dp)
-                .clickable { imageSofa.value = imageUrl },
+                .clickable { imageSofa = imageUrl },
             shape = RoundedShapes.medium,
             elevation = 2.dp
         ) {

@@ -7,10 +7,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.threedapp.base.*
-import com.example.threedapp.screens.AppNavHost
+import com.example.threedapp.screens.navigation.AppNavHost
+import com.example.threedapp.screens.navigation.appComponent
 import com.example.threedapp.ui.theme.ThreeDAppTheme
 import com.google.android.filament.utils.Utils
-import javax.inject.Inject
 
 class MainActivity : ComponentActivity() {
     companion object {
@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
         appComponent.inject(this)
         setContent {
             ThreeDAppTheme {
-                AppNavHost()
+                AppNavHost(appComponent = appComponent)
             }
         }
     }
