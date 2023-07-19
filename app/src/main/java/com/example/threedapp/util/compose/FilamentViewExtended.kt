@@ -27,7 +27,7 @@ fun FilamentViewExtended(scene:String) {
     var rotationVerticalScale by rememberSaveable  { mutableStateOf(0f) }
     var sliderVerticalScale by remember { mutableStateOf(0f) }
 
-    Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(modifier = Modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Card(
             modifier = Modifier
                 .pointerInput(Unit) {
@@ -65,8 +65,6 @@ fun FilamentViewExtended(scene:String) {
             )
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .fillMaxHeight()
                     .background(MaterialTheme.myColors.invisible)
                     .padding(end = 10.dp, top = 5.dp),
                 contentAlignment = Alignment.TopEnd

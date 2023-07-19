@@ -5,7 +5,7 @@ import com.example.threedapp.data.features.detail.DetailRepository
 import com.example.threedapp.screens.main.ProductRepCardFuncs
 
 class DetailViewModel(val detailRepository: DetailRepository):ViewModel() {
-    val mainFuncs = object :ProductRepCardFuncs{
+    val detailFuncs = object :DetailProductRepCardFuncs{
         override fun onClickExploreCard(id: Int) {
             TODO("Not yet implemented")
         }
@@ -27,4 +27,12 @@ class DetailViewModel(val detailRepository: DetailRepository):ViewModel() {
         }
 
     }
+}
+interface DetailProductRepCardFuncs {
+
+    fun onClickExploreCard(id:Int)
+    fun addToBag(id:Int)
+    fun removeFromBag(id:Int)
+    fun addToFavorite(id:Int)
+    fun removeFromFavorite(id:Int)
 }

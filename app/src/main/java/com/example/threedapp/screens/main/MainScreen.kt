@@ -164,7 +164,7 @@ fun MainScreen(
                         TabProductsList()
                     },
                     postContent = {
-                        UtilMainScreen()
+//                        UtilMainScreen()
                     }
                 )
             }
@@ -659,6 +659,7 @@ fun AddToBag(
     id:Int,
     addToBag: (id:Int) -> Unit,
     removeFromBag: (id:Int) -> Unit,
+    modifierBox:Modifier = Modifier.fillMaxHeight(),
 ) {
     var state by rememberSaveable {
         mutableStateOf(false)
@@ -670,8 +671,7 @@ fun AddToBag(
         shape = RoundedCornerShape(15.dp),
         elevation = 5.dp
     ) {
-        Box(modifier = Modifier
-            .fillMaxHeight()
+        Box(modifier = modifierBox
             .clickable {
                 if (!state) addToBag(id) else removeFromBag(id)
                 state = !state
@@ -691,7 +691,8 @@ fun AddToBag(
 @Composable
 fun AddToFavorite(id:Int,
                   addToFavorite: (id:Int) -> Unit,
-                  removeFromFvorite: (id:Int) -> Unit) {
+                  removeFromFvorite: (id:Int) -> Unit,
+                  modifierBox:Modifier = Modifier.fillMaxHeight(),) {
     var state by rememberSaveable {
         mutableStateOf(false)
     }
@@ -702,8 +703,7 @@ fun AddToFavorite(id:Int,
         shape = RoundedCornerShape(15.dp),
         elevation = 5.dp
     ) {
-        Box(modifier = Modifier
-            .fillMaxHeight()
+        Box(modifier = modifierBox
             .clickable {
 
                 if (!state) addToFavorite(id) else removeFromFvorite(id)
@@ -717,43 +717,6 @@ fun AddToFavorite(id:Int,
                 contentDescription = "add to favorite",
                 tint = if (state) MaterialTheme.myColors.primary else MaterialTheme.myColors.secondary
             )
-        }
-    }
-}
-
-@Composable
-fun UtilMainScreen() {
-    var buttonClickChangeScene by rememberSaveable { mutableStateOf(false) }
-    FilamentViewExtended(if (buttonClickChangeScene) "Wood" else "Chair")
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp),
-        backgroundColor = MaterialTheme.myColors.whiteColor,
-        shape = Shapes.small,
-        elevation = 2.dp
-    ) {
-        Column {
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp),
-                onClick = { buttonClickChangeScene = !buttonClickChangeScene },
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.myColors.secondary,
-                )
-            ) {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp),
-                    fontFamily = FontFamily.Serif,
-                    fontSize = 20.sp,
-                    color = MaterialTheme.myColors.background,
-                    text = "Change scene",
-                    textAlign = TextAlign.Center
-                )
-            }
         }
     }
 }

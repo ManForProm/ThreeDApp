@@ -87,7 +87,7 @@ fun AppNavHost(
             }
             DetailScreen(
                 navController,
-                viewModel = detailViewModel,
+                detailViewModel = detailViewModel,
                 productInformation = productInformation ?: ProductInformation(),
             )
             changeColorBars(color = MaterialTheme.myColors.background)
