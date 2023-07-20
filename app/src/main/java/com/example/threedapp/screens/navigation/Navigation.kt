@@ -69,7 +69,8 @@ fun AppNavHost(
         }
         composable(
             Screen.Settings.route,
-            enterTransition = { fadeIn() })
+            enterTransition = { fadeIn(animationSpec = tween(1000))},
+        )
         {
             val settingsViewModel: SettingsViewModel = daggerViewModel {
                 DaggerSettingsScreenComponent.builder().build().getViewModel()

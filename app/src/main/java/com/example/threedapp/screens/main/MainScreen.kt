@@ -6,6 +6,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -62,11 +63,12 @@ import com.example.threedapp.screens.main.models.ScreenChangerModel
 import com.example.threedapp.screens.main.models.TabItems
 import com.example.threedapp.screens.main.models.imageSofa
 import com.example.threedapp.ui.theme.*
+import com.example.threedapp.util.NavScreenChanger
 import com.example.threedapp.util.compose.FilamentViewExtended
 import com.example.threedapp.util.compose.InAppReview
 import com.example.threedapp.util.toColor
-import com.example.threedapp.util.toPrice
 import com.example.threedapp.util.toReview
+import com.example.threedapp.util.toStringPrice
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import kotlinx.serialization.json.Json
 //import com.google.gson.Gson
@@ -122,11 +124,10 @@ fun MainScreen(
                     })
             },
             bottomBar = {
-                Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Bottom) {
-                    MainScreenSnackbar(
-                        modifier = Modifier,
-                        snackbarParametrs = snackbarParametrs
-                    )
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.Bottom
+                ) {
                     BottomAppBar(modifier = Modifier
                         .height(bottomBarHeight)
                         .padding(5.dp)
@@ -138,7 +139,10 @@ fun MainScreen(
                         }
                         .clip(RoundedShapes.small),
                         backgroundColor = MaterialTheme.myColors.whiteColor) {
-
+                        MainScreenSnackbar(
+                            modifier = Modifier,
+                            snackbarParametrs = snackbarParametrs
+                        )
                         TabsNavigationBar(navHostController = navHostController)
                     }
                 }
@@ -171,48 +175,51 @@ fun MainScreen(
         }
     }
 }
+
 @Composable
-fun MainScreenChanger(navHostController: NavHostController){
+fun MainScreenChanger(navHostController: NavHostController) {
     val viewModel = mainCompositionProvider.current.viewModel
-//    val key = viewModel.screenChangerParams.collectAsState().value
-    val inf = ProductInformation(
-        id = 0,
-        price = Random.nextDouble(),
-        name = "Wood Cabinet",
-        type = TabItems.Cabinets,
-        mainColors = ItemCardColor(primary = AnsweredColorLight.value, secondary = AnsweredColorDark.value),
-        discription = "Sofa combines inspiration from the middle of the century with touches of new glam.",
-        image = imageSofa,
-        usersReview = Random.nextFloat(),
-    )
-//    val infJson = Uri.encode(Gson().toJson(inf))
-    val nav = object:NavScreenChanger {
-        override fun navigate(route:Screen,inf:ProductInformation ) {
-            navHostController.navigate( route.route + "/${Uri.encode(Json.encodeToString(ProductInformation.serializer(),inf))}")
+    val nav = object : NavScreenChanger {
+        override fun navigate(route: Screen, inf: ProductInformation) {
+            navHostController.navigate(
+                route.route +
+                        "/${Uri.encode(Json.encodeToString(ProductInformation.serializer(), inf))}"
+            )
         }
     }
     viewModel.sendIntent.getNavigationControl(nav)
 }
+
 @Composable
-fun MainScreenSnackbar(modifier: Modifier = Modifier,
-                       errorMessage:String = "error is occured",
-                       snackbarParametrs: MainSnackBarParams =
-                           MainSnackBarParams("Placeholder message",
-                               MainSnackbarState(MainSnackBarType.Standart,0))){
-    val viewModel =  mainCompositionProvider.current.viewModel
-    val name = viewModel.furnitureList.collectAsState().value[snackbarParametrs.snackbarState.id].name
+fun MainScreenSnackbar(
+    modifier: Modifier = Modifier,
+    errorMessage: String = "error is occured",
+    snackbarParametrs: MainSnackBarParams =
+        MainSnackBarParams(
+            "Placeholder message",
+            MainSnackbarState(MainSnackBarType.Standart, 0)
+        )
+) {
+    val viewModel = mainCompositionProvider.current.viewModel
+    val name =
+        viewModel.furnitureList.collectAsState().value[snackbarParametrs.snackbarState.id].name
     com.example.threedapp.util.compose.Snackbar(message = snackbarParametrs.massage,
         snackbarState = snackbarParametrs.snackbarState,
-        snackBarShowed = {viewModel.mainFuncs.snackBarShowed()}){
+        snackBarShowed = { viewModel.mainFuncs.snackBarShowed() }) {
         ("$name ${snackbarParametrs.massage}").apply {
-            when(snackbarParametrs.snackbarState.operation){
-                MainSnackBarType.Standart -> standartSnackbar(content = this,)
-                MainSnackBarType.AddToBag-> addToBagSnackbar(content = this,)
-                MainSnackBarType.AddToFavorite-> addToFavoriteSnackbar(content = this)
-                MainSnackBarType.RemoveFromBag -> addToBagSnackbar(content = this,
-                    backgroundColor = MaterialTheme.myColors.incorrectColor)
-                MainSnackBarType.RemoveFromFavorite -> addToFavoriteSnackbar(content = this,
-                    backgroundColor = MaterialTheme.myColors.incorrectColor)
+            when (snackbarParametrs.snackbarState.operation) {
+                MainSnackBarType.Standart -> standartSnackbar(content = this)
+                MainSnackBarType.AddToBag -> addToBagSnackbar(content = this)
+                MainSnackBarType.AddToFavorite -> addToFavoriteSnackbar(content = this)
+                MainSnackBarType.RemoveFromBag -> addToBagSnackbar(
+                    content = this,
+                    backgroundColor = MaterialTheme.myColors.incorrectColor
+                )
+
+                MainSnackBarType.RemoveFromFavorite -> addToFavoriteSnackbar(
+                    content = this,
+                    backgroundColor = MaterialTheme.myColors.incorrectColor
+                )
             }
         }
     }
@@ -221,14 +228,16 @@ fun MainScreenSnackbar(modifier: Modifier = Modifier,
 @Composable
 fun addToBagSnackbar(
     modifier: Modifier = Modifier,
-    title:String = "",
+    title: String = "",
     backgroundColor: Color = MaterialTheme.myColors.correctColor,
     content: String,
     onAction: () -> Unit = {}
-    
-){
-    Snackbar(elevation = 1.dp,
-    backgroundColor = backgroundColor) {
+
+) {
+    Snackbar(
+        elevation = 1.dp,
+        backgroundColor = backgroundColor
+    ) {
         Text(content)
     }
 }
@@ -236,14 +245,16 @@ fun addToBagSnackbar(
 @Composable
 fun addToFavoriteSnackbar(
     modifier: Modifier = Modifier,
-    title:String = "",
+    title: String = "",
     backgroundColor: Color = MaterialTheme.myColors.correctColor,
     content: String,
     onAction: () -> Unit = {}
 
-){
-    Snackbar(elevation = 1.dp,
-        backgroundColor = backgroundColor) {
+) {
+    Snackbar(
+        elevation = 1.dp,
+        backgroundColor = backgroundColor
+    ) {
         Text(content)
     }
 }
@@ -251,13 +262,15 @@ fun addToFavoriteSnackbar(
 @Composable
 fun standartSnackbar(
     modifier: Modifier = Modifier,
-    title:String = "",
+    title: String = "",
     content: String,
     onAction: () -> Unit = {}
 
-){
-    Snackbar(elevation = 1.dp,
-        backgroundColor = MaterialTheme.myColors.correctColor) {
+) {
+    Snackbar(
+        elevation = 1.dp,
+        backgroundColor = MaterialTheme.myColors.correctColor
+    ) {
 
     }
 }
@@ -444,7 +457,7 @@ fun ExploreItemCard(itemCardInformation: ProductInformation) {
                     fontFamily = FontFamily.SansSerif,
                     fontSize = 15.sp,
                     color = textColor,
-                    text = itemCardInformation.price.toPrice(),
+                    text = itemCardInformation.price.toStringPrice(),
                 )
             }
         }
@@ -453,15 +466,20 @@ fun ExploreItemCard(itemCardInformation: ProductInformation) {
 
 @Composable
 fun TabProductsList() {
+    val viewModel = mainCompositionProvider.current.viewModel.mainFuncs
     LazyRow {
         items(items = TabItems.getAllTabs()) { tab ->
-            TabListCard(tab)
+            TabListCard(tab = tab,
+            addSortedType = viewModel::addSortedType,
+            removeSortedType = viewModel::removeSortedType,)
         }
     }
 }
 
 @Composable
-fun TabListCard(tab: TabItems) {
+fun TabListCard(tab: TabItems,
+                addSortedType: (tab: TabItems) -> Unit,
+                removeSortedType: (tab: TabItems) -> Unit,) {
     var state by rememberSaveable {
         mutableStateOf(false)
     }
@@ -476,6 +494,7 @@ fun TabListCard(tab: TabItems) {
         Box(modifier = Modifier
             .fillMaxSize()
             .clickable {
+                if (!state) addSortedType(tab) else removeSortedType(tab)
                 state = !state
             }) {
             Text(
@@ -509,7 +528,7 @@ fun ProductsList(
 
         items(items = productsInfornation.productsList) { product ->
             Box(modifier = Modifier.padding(20.dp)) {
-                ProductRepresentationCard(product,)
+                ProductRepresentationCard(product)
             }
         }
 
@@ -522,6 +541,7 @@ fun ProductRepresentationCard(
     product: ProductInformation,
     funcs: ProductRepCardFuncs = mainCompositionProvider.current.viewModel.mainFuncs,
 ) {
+    val interactionSource = remember{ MutableInteractionSource() }
 
     Box(
         modifier = Modifier, contentAlignment = Alignment.BottomEnd
@@ -557,7 +577,12 @@ fun ProductRepresentationCard(
             )
         }
     }
-    Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier = Modifier
+        .fillMaxSize()
+        .clickable(interactionSource = interactionSource,indication = null) {
+        funcs.onClickProductCard(product.id)
+                                                                            },
+        verticalAlignment = Alignment.CenterVertically) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -597,7 +622,7 @@ fun ProductRepresentationCard(
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 15.sp,
                     color = MaterialTheme.myColors.answeredColor,
-                    text = product.price.toPrice(),
+                    text = product.price.toStringPrice(),
                     textAlign = TextAlign.Start
                 )
                 Row {
@@ -623,13 +648,16 @@ fun ProductRepresentationCard(
                     )
                 }
                 Row {
-                    AddToBag(id = product.id,
+                    AddToBag(
+                        id = product.id,
                         funcs::addToBag,
                         funcs::removeFromBag,
                     )
-                    AddToFavorite(id = product.id,
+                    AddToFavorite(
+                        id = product.id,
                         funcs::addToFavorite,
-                        funcs::removeFromFavorite)
+                        funcs::removeFromFavorite
+                    )
                 }
             }
         }
@@ -656,10 +684,10 @@ fun ProductRepresentationCard(
 
 @Composable
 fun AddToBag(
-    id:Int,
-    addToBag: (id:Int) -> Unit,
-    removeFromBag: (id:Int) -> Unit,
-    modifierBox:Modifier = Modifier.fillMaxHeight(),
+    id: Int,
+    addToBag: (id: Int) -> Unit,
+    removeFromBag: (id: Int) -> Unit,
+    modifierBox: Modifier = Modifier.fillMaxHeight(),
 ) {
     var state by rememberSaveable {
         mutableStateOf(false)
@@ -675,24 +703,26 @@ fun AddToBag(
             .clickable {
                 if (!state) addToBag(id) else removeFromBag(id)
                 state = !state
-            }){
-        Icon(
-            modifier = Modifier
-                .size(45.dp)
-                .padding(10.dp),
-            imageVector = if (state) Icons.Filled.ShoppingBag else Icons.Outlined.ShoppingBag,
-            contentDescription = "add to bag",
-            tint = if (state) MaterialTheme.myColors.primary else MaterialTheme.myColors.secondary
-        )
+            }) {
+            Icon(
+                modifier = Modifier
+                    .size(45.dp)
+                    .padding(10.dp),
+                imageVector = if (state) Icons.Filled.ShoppingBag else Icons.Outlined.ShoppingBag,
+                contentDescription = "add to bag",
+                tint = if (state) MaterialTheme.myColors.primary else MaterialTheme.myColors.secondary
+            )
         }
     }
 }
 
 @Composable
-fun AddToFavorite(id:Int,
-                  addToFavorite: (id:Int) -> Unit,
-                  removeFromFvorite: (id:Int) -> Unit,
-                  modifierBox:Modifier = Modifier.fillMaxHeight(),) {
+fun AddToFavorite(
+    id: Int,
+    addToFavorite: (id: Int) -> Unit,
+    removeFromFvorite: (id: Int) -> Unit,
+    modifierBox: Modifier = Modifier.fillMaxHeight(),
+) {
     var state by rememberSaveable {
         mutableStateOf(false)
     }

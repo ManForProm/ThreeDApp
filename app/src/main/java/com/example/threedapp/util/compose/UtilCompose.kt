@@ -1,11 +1,18 @@
 package com.example.threedapp.util.compose
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.sharp.ArrowBackIosNew
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -15,9 +22,39 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.threedapp.ui.theme.myColors
 
+
+@Composable
+fun getInvertColor(color: Color, minusAlpha: Float = 0f) = color.copy(
+    alpha = color.alpha - minusAlpha,
+    red = 1 - color.red,
+    green = 1 - color.green,
+    blue = 1 - color.blue,
+)
+
+@Composable
+fun BackButton( color:Color,
+                backgroundColor:Color = MaterialTheme.myColors.background,
+                onClickBack:() -> Unit,){
+    Card(
+        modifier = Modifier,
+        shape = CircleShape,
+    ) {
+        Icon(
+            modifier = Modifier.clickable { onClickBack() }
+                .background(backgroundColor)
+                .padding(10.dp)
+                .size(20.dp),
+            imageVector = Icons.Sharp.ArrowBackIosNew,
+            contentDescription = "back button",
+            tint = color
+        )
+    }
+}
 
 data class Stars(
     val oneStarIcon:ImageVector,
@@ -144,7 +181,7 @@ fun InAppReview(
             modifier = modifier
                 .clickable(
                     enabled = !inAppReviewByValue
-                )  {
+                ) {
 
                     stars.twoStars()
 
@@ -158,7 +195,7 @@ fun InAppReview(
             modifier = modifier
                 .clickable(
                     enabled = !inAppReviewByValue
-                )  {
+                ) {
                     stars.threeStars()
 
                 }
@@ -171,7 +208,7 @@ fun InAppReview(
             modifier = modifier
                 .clickable(
                     enabled = !inAppReviewByValue
-                )  {
+                ) {
                     stars.fourStars()
                 }
                 .size(_size.value),
@@ -183,7 +220,7 @@ fun InAppReview(
             modifier = modifier
                 .clickable(
                     enabled = !inAppReviewByValue
-                )  {
+                ) {
                     stars.fiveStars()
                 }
                 .size(_size.value),
@@ -193,4 +230,12 @@ fun InAppReview(
         )
     }
     return stars.localRatedState.value
+}
+
+@Preview
+@Composable
+fun BackButtonPreview(){
+    Column() {
+        BackButton(color = Color.Blue) {}
+    }
 }
