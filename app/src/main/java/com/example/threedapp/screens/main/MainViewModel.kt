@@ -1,6 +1,10 @@
 package com.example.threedapp.screens.main
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.threedapp.base.IntentHendler
@@ -36,12 +40,13 @@ class MainViewModel(private val mainRepository: MainRepository) :
     private val _screenChangerParams = MutableStateFlow(ScreenChangerModel())
     val screenChangerParams: StateFlow<ScreenChangerModel> = _screenChangerParams
 
-    private val furnitureListAll = MutableStateFlow<List<ProductInformation>>(emptyList())
+    private val _furnitureFullList =
+        MutableStateFlow(listOf(ProductInformation()))
 
-    private val _furnitureList =
-        MutableStateFlow<MutableList<ProductInformation>>(mutableListOf())
+    private val _furnitureList: SnapshotStateList<ProductInformation>? =
+        mutableStateListOf <ProductInformation>()
 
-    val furnitureList: StateFlow<List<ProductInformation>>
+    val furnitureList: List<ProductInformation>?
         get() = _furnitureList
 
     private val _furnitureListExplore = MutableStateFlow<List<ProductInformation>>(emptyList())
@@ -99,19 +104,23 @@ class MainViewModel(private val mainRepository: MainRepository) :
             )
         }
 
+
         override fun addSortedType(type: TabItems) {
-            _furnitureList.value.forEach {
-                if (it.type == type) {
-                    _furnitureList.value.remove(it)
+            _furnitureFullList.value.forEach { product ->
+                if(product.type == type){
+                    _furnitureList?.add(product)
                 }
             }
         }
 
         override fun removeSortedType(type: TabItems) {
-            _furnitureList.value.forEach {
-                if (it.type == type) {
-                    _furnitureList.value.add(it)
-                }
+            _furnitureList?.removeIf{it.type == type}
+//                    _furnitureList.value.addI(it)
+        }
+
+        override fun isSortActive(state: Boolean) {
+            if(!state){
+                _furnitureList?.addAll(_furnitureFullList.value)
             }
         }
 
@@ -136,7 +145,7 @@ class MainViewModel(private val mainRepository: MainRepository) :
 
         override fun openDetailPage(id: Int) {
 //            _screenChangerParams.value = ScreenChangerModel(id)
-            navigation?.navigate(Screen.Detail, _furnitureList.value[id])
+            navigation?.navigate(Screen.Detail, _furnitureList?.get(id) ?: ProductInformation())
         }
     }
 
@@ -146,7 +155,7 @@ class MainViewModel(private val mainRepository: MainRepository) :
         viewModelScope.launch {
             mainRepository.getListItems()
                 .collect { value ->
-                    _furnitureList.value = value.toMutableList()
+                    _furnitureFullList.value = value
                 }
             mainRepository.getListExploreItems()
                 .collect { value ->
@@ -171,22 +180,28 @@ interface ProductRepCardSendIntent {
     fun openDetailPage(id: Int)
 }
 
-interface MainScreenFuncs : ProductRepCardFuncs, SnackbarFuncs {
+interface MainScreenFuncs : ProductRepCardFuncs, SnackbarFuncs,ExploreCardFuncs,SortByTypeFuncs {
+
 }
 
 interface SnackbarFuncs {
     fun snackBarShowed()
 }
+interface ExploreCardFuncs{
+    fun onClickExploreCard(id: Int)
+}
+
+interface SortByTypeFuncs{
+
+    fun addSortedType(type: TabItems)
+    fun removeSortedType(type: TabItems)
+    fun isSortActive(state:Boolean)
+}
 
 interface ProductRepCardFuncs {
-
-    fun onClickExploreCard(id: Int)
     fun onClickProductCard(id: Int)
     fun addToBag(id: Int)
     fun removeFromBag(id: Int)
     fun addToFavorite(id: Int)
     fun removeFromFavorite(id: Int)
-
-    fun addSortedType(type: TabItems)
-    fun removeSortedType(type: TabItems)
 }

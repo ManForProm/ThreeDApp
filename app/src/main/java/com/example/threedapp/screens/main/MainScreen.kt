@@ -84,7 +84,7 @@ fun MainScreen(
     navHostController: NavHostController,
     mainViewModel: MainViewModel
 ) {
-    val listItemsMain by mainViewModel.furnitureList.collectAsState()
+    val listItemsMain = mainViewModel.furnitureList
     val listItemsExplore by mainViewModel.furnitureListExplore.collectAsState()
     val snackbarParametrs by mainViewModel.snackBarParams.collectAsState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
@@ -152,7 +152,7 @@ fun MainScreen(
                 ProductsList(
                     ProductsList(
                         id = "1",
-                        productsList = listItemsMain,
+                        productsList = listItemsMain ?: listOf(ProductInformation()),
                     ),
                     modifier = Modifier
                         .nestedScroll(scrollBehavior.nestedScrollConnection)
@@ -202,7 +202,7 @@ fun MainScreenSnackbar(
 ) {
     val viewModel = mainCompositionProvider.current.viewModel
     val name =
-        viewModel.furnitureList.collectAsState().value[snackbarParametrs.snackbarState.id].name
+        viewModel.furnitureList?.get(snackbarParametrs.snackbarState.id)?.name ?: ""
     com.example.threedapp.util.compose.Snackbar(message = snackbarParametrs.massage,
         snackbarState = snackbarParametrs.snackbarState,
         snackBarShowed = { viewModel.mainFuncs.snackBarShowed() }) {
@@ -470,6 +470,7 @@ fun TabProductsList() {
     LazyRow {
         items(items = TabItems.getAllTabs()) { tab ->
             TabListCard(tab = tab,
+                isSortEctive = viewModel::isSortActive,
             addSortedType = viewModel::addSortedType,
             removeSortedType = viewModel::removeSortedType,)
         }
@@ -478,6 +479,7 @@ fun TabProductsList() {
 
 @Composable
 fun TabListCard(tab: TabItems,
+                isSortEctive: (state:Boolean) -> Unit,
                 addSortedType: (tab: TabItems) -> Unit,
                 removeSortedType: (tab: TabItems) -> Unit,) {
     var state by rememberSaveable {
@@ -526,9 +528,30 @@ fun ProductsList(
     ) {
         item { preContent() }
 
-        items(items = productsInfornation.productsList) { product ->
-            Box(modifier = Modifier.padding(20.dp)) {
-                ProductRepresentationCard(product)
+        if(productsInfornation.productsList.isNotEmpty()) {
+            items(
+                items = productsInfornation.productsList
+            ) { product ->
+                Box(modifier = Modifier.padding(20.dp)) {
+                    ProductRepresentationCard(product)
+                }
+            }
+        }else {
+            item {
+                Box(modifier = Modifier.padding(20.dp)) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.Center)
+                            .padding(top = 10.dp, bottom = 4.dp),
+                        fontFamily = FontFamily.SansSerif,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp,
+                        color = MaterialTheme.myColors.secondary,
+                        text = "No results matching your search",
+                        textAlign = TextAlign.Start
+                    )
+                }
             }
         }
 
@@ -581,6 +604,7 @@ fun ProductRepresentationCard(
         .fillMaxSize()
         .clickable(interactionSource = interactionSource,indication = null) {
         funcs.onClickProductCard(product.id)
+
                                                                             },
         verticalAlignment = Alignment.CenterVertically) {
         Box(
